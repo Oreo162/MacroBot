@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MacroBot">
+<meta name="theme-color" content="#0a0a12">
+<title>MacroBot</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a12;--surface:#111120;--surface2:#1a1a2e;--border:#ffffff0f;
+  --text:#e8e8f0;--muted:#6b6b8a;
+  --amber:#f59e0b;--green:#6ee7b7;--blue:#60a5fa;--red:#f87171;--purple:#a78bfa;
+  --font-d:'Bebas Neue',sans-serif;--font-b:'DM Sans',sans-serif;
+  --r:14px;--rs:8px;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-b);overflow:hidden}
+.app{display:flex;flex-direction:column;height:100%;height:-webkit-fill-available}
+.hdr{padding:calc(var(--safe-top) + .5rem) 1rem .5rem;background:rgba(10,10,18,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);flex-shrink:0}
+.hdr-inner{display:flex;align-items:center;gap:.7rem}
+.logo{font-family:var(--font-d);font-size:1.6rem;color:var(--amber);letter-spacing:.06em;line-height:1;flex-shrink:0}
+.tab-bar{display:flex;gap:.28rem;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex:1}
+.tab-bar::-webkit-scrollbar{display:none}
+.pill{background:transparent;border:1px solid var(--border);color:var(--muted);padding:.24rem .6rem;border-radius:999px;font-family:var(--font-b);font-size:.7rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0}
+.pill:active{opacity:.7}.pill.on{background:var(--amber);border-color:var(--amber);color:#000}
+.main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1rem 1rem calc(var(--safe-bot) + 1.5rem)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:.8rem}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem}
+.ct{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+h2{font-family:var(--font-d);font-size:1.5rem;letter-spacing:.04em}
+.frow{display:flex;gap:.5rem;flex-wrap:wrap}
+.fl{display:flex;flex-direction:column;gap:.24rem;font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;flex:1;min-width:82px}
+.fi{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);padding:.46rem .6rem;font-family:var(--font-b);font-size:.84rem;outline:none;width:100%;transition:border-color .15s;-webkit-appearance:none}
+.fi:focus{border-color:var(--amber)}select.fi{cursor:pointer}
+textarea.fi{resize:vertical;min-height:80px;line-height:1.4}
+.btn{border:none;border-radius:var(--rs);font-family:var(--font-b);font-weight:700;font-size:.78rem;cursor:pointer;transition:opacity .15s;-webkit-tap-highlight-color:transparent}
+.btn:active{opacity:.7}
+.btn-p{background:var(--amber);color:#000;padding:.48rem 1rem;margin-top:.55rem}
+.btn-s{background:var(--surface2);color:var(--text);border:1px solid var(--border)!important;padding:.48rem .82rem}
+.btn-g{background:transparent;border:1px solid var(--border)!important;color:var(--muted);padding:.24rem .6rem;font-size:.7rem}
+.btn-g:active{border-color:var(--amber)!important;color:var(--amber)}
+.btn-danger{background:#f8717122;color:var(--red);border:1px solid #f8717133!important;padding:.28rem .6rem;font-size:.72rem}
+.btn-x{background:transparent;border:none;color:var(--muted);font-size:.76rem;padding:.1rem .3rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.btn-x:active{color:var(--red)}
+.rings{display:flex;gap:.9rem;flex-wrap:wrap;justify-content:center}
+.ring-w{display:flex;flex-direction:column;align-items:center;gap:.16rem}
+.ring-lbl{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.ring-val{font-size:.63rem;color:var(--muted)}
+.bdg{display:inline-block;padding:.1rem .36rem;border-radius:999px;font-size:.68rem;font-weight:700}
+.a{background:#f59e0b22;color:var(--amber)}.g{background:#6ee7b722;color:var(--green)}
+.b{background:#60a5fa22;color:var(--blue)}.r{background:#f8717122;color:var(--red)}
+.v{background:#a78bfa22;color:var(--purple)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.74rem}
+th{color:var(--muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;padding:.3rem .35rem;text-align:left;border-bottom:1px solid var(--border)}
+td{padding:.36rem .35rem;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.tfoot-row td{border-top:1px solid var(--border);font-weight:700}
+.wsnap{display:flex;align-items:baseline;gap:.3rem}
+.wb{font-family:var(--font-d);font-size:2.4rem;color:var(--purple);line-height:1}
+.wu{color:var(--muted);font-size:.78rem}
+.chart-scroll-outer{overflow-x:auto;-webkit-overflow-scrolling:touch;cursor:grab;border-radius:var(--rs)}
+.chart-scroll-outer:active{cursor:grabbing}
+.chart-scroll-outer::-webkit-scrollbar{height:3px}
+.chart-scroll-outer::-webkit-scrollbar-track{background:var(--surface2)}
+.chart-scroll-outer::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px}
+canvas{display:block}
+.chart-legend{display:flex;gap:.85rem;flex-wrap:wrap;margin-top:.38rem}
+.cl-item{display:flex;align-items:center;gap:.26rem;font-size:.66rem;color:var(--muted)}
+.cl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.chart-hint{font-size:.63rem;color:var(--muted);margin-top:.28rem;text-align:right}
+.trows{display:flex;flex-direction:column;gap:.4rem}
+.trow{display:flex;justify-content:space-between;align-items:center;font-size:.8rem}
+.tnote{font-size:.64rem;color:var(--muted);margin-top:.5rem}
+.sets{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.4rem}
+.srow{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap}
+.snum{font-size:.66rem;color:var(--muted);min-width:32px}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.8rem}
+.s2{grid-column:1/-1}
+@media(max-width:420px){.dgrid{grid-template-columns:1fr}.s2{grid-column:auto}}
+.empty{color:var(--muted);font-size:.78rem;text-align:center;padding:1rem 0}
+.tdee-num{font-family:var(--font-d);font-size:2.7rem;color:var(--amber);line-height:1}
+.tdee-u{color:var(--muted);font-size:.76rem}
+.tdee-d{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.42rem}
+.tdee-d span{background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:.14rem .45rem;font-size:.66rem;color:var(--muted)}
+.pbar-wrap{height:5px;background:var(--surface2);border-radius:999px;overflow:hidden;margin-top:.26rem}
+.pbar{height:100%;border-radius:999px;transition:width .35s ease}
+.food-res{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);max-height:165px;overflow-y:auto;margin-top:.26rem}
+.food-res-item{padding:.42rem .62rem;cursor:pointer;font-size:.78rem;border-bottom:1px solid var(--border)}
+.food-res-item:last-child{border-bottom:none}
+.food-res-item:active{background:var(--surface)}
+.fi-name{font-weight:600}.fi-macro{font-size:.66rem;color:var(--muted)}
+.shdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.82rem;flex-wrap:wrap;gap:.42rem}
+.toggle-r{display:flex;gap:.3rem}
+.tab{animation:fi .2s ease}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+#toast{position:fixed;bottom:calc(var(--safe-bot) + 3.8rem);left:50%;transform:translateX(-50%) translateY(18px);background:var(--green);color:#000;padding:.36rem .9rem;border-radius:999px;font-weight:700;font-size:.76rem;opacity:0;transition:all .22s;pointer-events:none;z-index:999;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.modal{background:var(--surface);border-radius:var(--r) var(--r) 0 0;padding:1.25rem 1rem calc(var(--safe-bot) + 1.25rem);width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+.modal h3{font-family:var(--font-d);font-size:1.3rem;margin-bottom:.85rem}
+.day-modal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.95rem}
+.day-date{font-family:var(--font-d);font-size:1.55rem;color:var(--amber)}
+.day-section{margin-bottom:.95rem}
+.day-section-title{font-size:.66rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.45rem}
+/* DB tab */
+.db-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:.7rem .85rem;margin-bottom:.55rem;display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem}
+.db-item-info{flex:1;min-width:0}
+.db-item-name{font-weight:700;font-size:.88rem;margin-bottom:.18rem}
+.db-item-macros{font-size:.68rem;color:var(--muted)}
+.db-item-actions{display:flex;gap:.35rem;flex-shrink:0;align-items:center}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr"><div class="hdr-inner"><span class="logo">🤖 MacroBot</span><div class="tab-bar" id="tabBar"></div></div></div>
+  <div class="main" id="main"></div>
+</div>
+<div id="toast"></div>
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+// STORAGE — always persists to localStorage
+// ══════════════════════════════════════════════════════════════════════════════
+const S={
+  get(k){try{const v=localStorage.getItem('forge_'+k);return v?JSON.parse(v):null}catch{return null}},
+  set(k,v){try{localStorage.setItem('forge_'+k,JSON.stringify(v));return true}catch(e){console.warn('Storage full?',e);return false}}
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// STATE — loaded from localStorage on startup
+// ══════════════════════════════════════════════════════════════════════════════
+let state={
+  tab:0,
+  profile:    S.get('profile')  ||{weight:'',height:'',age:'',sex:'male',activity:1,goal:2},
+  macroLog:   S.get('macroLog') ||{},   // {date:[{name,cal,protein,carbs,fat,qty,unit}]}
+  workouts:   S.get('workouts') ||{},   // {date:[{exercise,sets:[{reps,weight}]}]}
+  weightLog:  S.get('weightLog')||[],   // [{date,weight}]
+  foodDB:     S.get('foodDB')   ||[],   // [{name,cal,protein,carbs,fat,unit}]
+  goals:      S.get('goals')    ||{calMin:0,calMax:0,protMin:0,protMax:0,useCustomCal:false,useCustomProt:false}
+};
+
+function save(k){
+  const ok=S.set(k,state[k]);
+  if(!ok) console.warn('Could not save',k);
+}
+// Save everything on page hide/unload so nothing is lost
+window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') saveAll()});
+window.addEventListener('pagehide',saveAll);
+window.addEventListener('beforeunload',saveAll);
+function saveAll(){['profile','macroLog','workouts','weightLog','foodDB','goals'].forEach(k=>save(k))}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════════════════════════════════════
+const ACTIVITY=[
+  {label:'Sedentary (desk job)',mult:1.2},
+  {label:'Lightly active (1–3x/wk)',mult:1.375},
+  {label:'Moderately active (3–5x/wk)',mult:1.55},
+  {label:'Very active (6–7x/wk)',mult:1.725},
+  {label:'Athlete (2x/day)',mult:1.9}
+];
+const GOAL_PRESETS=[
+  {label:'Cut (–500 kcal)',delta:-500},
+  {label:'Mild cut (–250 kcal)',delta:-250},
+  {label:'Maintain',delta:0},
+  {label:'Clean Bulk (+150 kcal)',delta:150,cleanBulk:true},
+  {label:'Mild Bulk (+250 kcal)',delta:250},
+  {label:'Bulk (+500 kcal)',delta:500},
+  {label:'Custom',delta:0,custom:true}
+];
+const TABS=['Dashboard','Macros','Workouts','Weight','Food DB'];
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TDEE / TARGETS
+// ══════════════════════════════════════════════════════════════════════════════
+function calcTDEE(){
+  const p=state.profile;
+  if(!p.weight||!p.height||!p.age) return null;
+  const wkg=+p.weight*0.453592,hcm=+p.height*2.54,a=+p.age;
+  const bmr=p.sex==='male'?10*wkg+6.25*hcm-5*a+5:10*wkg+6.25*hcm-5*a-161;
+  const preset=GOAL_PRESETS[p.goal??2];
+  return Math.round(bmr*ACTIVITY[p.activity||1].mult+(preset.cleanBulk?150:preset.delta||0));
+}
+function getCalTarget(){
+  if(state.goals.useCustomCal&&state.goals.calMax) return {min:+state.goals.calMin||0,max:+state.goals.calMax};
+  const t=calcTDEE(); return t?{min:0,max:t}:{min:0,max:2000};
+}
+function getProtTarget(){
+  if(state.goals.useCustomProt&&state.goals.protMax) return {min:+state.goals.protMin||0,max:+state.goals.protMax};
+  const p=state.profile,preset=GOAL_PRESETS[p.goal??2],t=calcTDEE();
+  if(preset&&preset.cleanBulk&&p.weight) return {min:Math.round(+p.weight*0.9),max:Math.round(+p.weight*1.1)};
+  return {min:0,max:t?Math.round((t*0.3)/4):150};
+}
+function getMT(){
+  const t=calcTDEE()||2000;
+  return {cal:getCalTarget(),protein:getProtTarget(),carbs:{min:0,max:Math.round((t*0.4)/4)},fat:{min:0,max:Math.round((t*0.3)/9)}};
+}
+function today(){return new Date().toISOString().slice(0,10)}
+function getTotals(date){
+  return (state.macroLog[date]||[]).reduce((a,i)=>({cal:a.cal+(+i.cal||0),protein:a.protein+(+i.protein||0),carbs:a.carbs+(+i.carbs||0),fat:a.fat+(+i.fat||0)}),{cal:0,protein:0,carbs:0,fat:0});
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════════════════════
+function toast(msg,color){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.background=color||'var(--green)';
+  t.style.color=color?'#fff':'#000';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SCROLLABLE CANVAS CHART
+// ══════════════════════════════════════════════════════════════════════════════
+const MIN_PX=22,CHART_H=155,PAD={t:12,r:14,b:32,l:44};
+
+function makeScrollChart(containerId,datasets,labels,opts={}){
+  const outer=document.getElementById(containerId);
+  if(!outer) return;
+  outer.innerHTML='';
+  if(!labels.length){outer.innerHTML='<p class="empty" style="padding:.7rem">No data yet.</p>';return;}
+  const dpr=window.devicePixelRatio||1;
+  const visW=outer.offsetWidth||300;
+  const nPts=labels.length;
+  const totalW=Math.max(visW,PAD.l+nPts*MIN_PX+PAD.r);
+  const H=opts.height||CHART_H;
+  const canvas=document.createElement('canvas');
+  canvas.width=totalW*dpr; canvas.height=H*dpr;
+  canvas.style.width=totalW+'px'; canvas.style.height=H+'px';
+  outer.appendChild(canvas);
+  requestAnimationFrame(()=>{outer.scrollLeft=outer.scrollWidth});
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  const cw=totalW-PAD.l-PAD.r,ch=H-PAD.t-PAD.b;
+  const allVals=datasets.flatMap(d=>d.data.filter(v=>v!=null&&!isNaN(v)));
+  if(!allVals.length) return;
+  let ymin=Math.min(...allVals),ymax=Math.max(...allVals);
+  const ypad=(ymax-ymin)*0.18||5; ymin-=ypad; ymax+=ypad;
+  function xp(i){return PAD.l+(i/(nPts>1?nPts-1:1))*cw}
+  function yp(v){return PAD.t+ch-((v-ymin)/(ymax-ymin))*ch}
+  ctx.fillStyle='#111120'; ctx.fillRect(0,0,totalW,H);
+  ctx.strokeStyle='#ffffff08'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const v=ymin+(ymax-ymin)*(i/4),y=yp(v);ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cw,y);ctx.stroke();ctx.fillStyle='#6b6b8a';ctx.font='10px DM Sans,sans-serif';ctx.textAlign='right';ctx.fillText(Math.round(v),PAD.l-4,y+3);}
+  const step=Math.max(1,Math.ceil(nPts/Math.floor(cw/38)));
+  ctx.fillStyle='#6b6b8a';ctx.font='9px DM Sans,sans-serif';ctx.textAlign='center';
+  labels.forEach((lbl,i)=>{if(i%step===0||i===nPts-1)ctx.fillText(lbl.slice(5),xp(i),H-PAD.b+13);});
+  labels.forEach((lbl,i)=>{if(lbl.slice(8)==='01'){ctx.strokeStyle='#ffffff05';ctx.beginPath();ctx.moveTo(xp(i),PAD.t);ctx.lineTo(xp(i),PAD.t+ch);ctx.stroke();}});
+  datasets.forEach(ds=>{
+    const pts=ds.data.map((v,i)=>v!=null&&!isNaN(v)?{x:xp(i),y:yp(v),v,i}:null);
+    if(ds.targetMax!=null){ctx.save();ctx.globalAlpha=.07;ctx.fillStyle=ds.color;ctx.fillRect(PAD.l,yp(Math.min(ds.targetMax,ymax)),cw,yp(Math.max(ds.targetMin||0,ymin))-yp(Math.min(ds.targetMax,ymax)));ctx.restore();ctx.save();ctx.strokeStyle=ds.color;ctx.globalAlpha=.2;ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(PAD.l,yp(ds.targetMax));ctx.lineTo(PAD.l+cw,yp(ds.targetMax));ctx.stroke();ctx.restore();ctx.setLineDash([]);}
+    if(ds.fill){const vp=pts.filter(Boolean);if(vp.length>1){ctx.beginPath();ctx.moveTo(vp[0].x,PAD.t+ch);vp.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(vp[vp.length-1].x,PAD.t+ch);ctx.closePath();const g=ctx.createLinearGradient(0,PAD.t,0,PAD.t+ch);g.addColorStop(0,ds.color+'38');g.addColorStop(1,ds.color+'00');ctx.fillStyle=g;ctx.fill();}}
+    ctx.beginPath();ctx.strokeStyle=ds.color;ctx.lineWidth=2.2;ctx.lineJoin='round';let pen=false;pts.forEach(p=>{if(!p){pen=false;return}pen?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);pen=true;});ctx.stroke();
+    pts.forEach(p=>{if(!p)return;ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fillStyle=ds.color;ctx.fill();});
+  });
+  canvas._labels=labels; canvas._nPts=nPts; canvas._xp=xp;
+}
+
+document.addEventListener('click',e=>{
+  const outer=e.target.closest('.chart-scroll-outer');
+  if(!outer)return;
+  const canvas=outer.querySelector('canvas');
+  if(!canvas||!canvas._labels)return;
+  const rect=canvas.getBoundingClientRect();
+  const rawX=e.clientX-rect.left+outer.scrollLeft;
+  let best=-1,bestDist=999;
+  canvas._labels.forEach((_,i)=>{const d=Math.abs(rawX-canvas._xp(i));if(d<bestDist){bestDist=d;best=i;}});
+  if(best>=0&&bestDist<MIN_PX*2)openDayDetail(canvas._labels[best]);
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DAY DETAIL MODAL
+// ══════════════════════════════════════════════════════════════════════════════
+function openDayDetail(date){
+  const entries=state.macroLog[date]||[];
+  const wEntry=state.weightLog.find(w=>w.date===date);
+  const tot=getTotals(date);const mt=getMT();
+  const modal=document.createElement('div');
+  modal.className='modal-bg';modal.id='dayModal';
+  modal.innerHTML=`<div class="modal" style="max-height:88vh">
+    <div class="day-modal-header">
+      <div><div class="day-date">${date}</div>
+        ${wEntry?`<div style="font-size:.8rem;color:var(--purple);font-weight:600;margin-top:.1rem">⚖ ${wEntry.weight} lbs</div>`:`<div style="font-size:.75rem;color:var(--muted)">No weight logged</div>`}
+      </div>
+      <button class="btn btn-g" onclick="closeModal('dayModal')">✕</button>
+    </div>
+    <div class="day-section"><div class="day-section-title">Macros</div>
+      <div class="rings" style="justify-content:flex-start;gap:.8rem">
+        ${ring('Cal',tot.cal,mt.cal.max,'#f59e0b')}${ring('Pro',tot.protein,mt.protein.max,'#6ee7b7')}${ring('Carbs',tot.carbs,mt.carbs.max,'#60a5fa')}${ring('Fat',tot.fat,mt.fat.max,'#f87171')}
+      </div>
+      <div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.55rem">
+        <span class="bdg a">${tot.cal} kcal</span><span class="bdg g">${tot.protein}g protein</span><span class="bdg b">${tot.carbs}g carbs</span><span class="bdg r">${tot.fat}g fat</span>
+      </div>
+    </div>
+    <div class="day-section"><div class="day-section-title">Foods (${entries.length})</div>
+      ${entries.length===0?`<p class="empty" style="padding:.4rem 0">Nothing logged.</p>`:`
+      <div class="tw"><table>
+        <thead><tr><th>Food</th><th>Qty</th><th>Cal</th><th>Pro</th><th>Carbs</th><th>Fat</th></tr></thead>
+        <tbody>${entries.map(e=>`<tr>
+          <td style="font-weight:500;max-width:105px;word-break:break-word">${e.name}</td>
+          <td style="font-size:.7rem;color:var(--muted)">${e.qty||1}${e.unit?' '+e.unit:''}</td>
+          <td><span class="bdg a">${e.cal}</span></td><td><span class="bdg g">${e.protein}g</span></td><td><span class="bdg b">${e.carbs}g</span></td><td><span class="bdg r">${e.fat}g</span></td>
+        </tr>`).join('')}
+        <tr class="tfoot-row"><td colspan="2">Total</td><td><span class="bdg a">${tot.cal}</span></td><td><span class="bdg g">${tot.protein}g</span></td><td><span class="bdg b">${tot.carbs}g</span></td><td><span class="bdg r">${tot.fat}g</span></td></tr>
+        </tbody></table></div>`}
+    </div>
+    <button class="btn btn-p" style="width:100%" onclick="closeModal('dayModal');jumpToMacros('${date}')">Edit this day →</button>
+  </div>`;
+  document.body.appendChild(modal);
+}
+function jumpToMacros(date){state.tab=1;_macroDate=date;renderTabBar();renderMain()}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// RING SVG
+// ══════════════════════════════════════════════════════════════════════════════
+function ring(label,current,target,color){
+  const pct=target?Math.min(current/target,1):0;
+  const r=25,cx=31,cy=31,circ=2*Math.PI*r,dash=pct*circ;
+  const c=current>target&&target>0?'#f87171':color;
+  return `<div class="ring-w"><svg width="62" height="62" style="overflow:visible">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1e1e2a" stroke-width="6"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c}" stroke-width="6" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${circ/4}" stroke-linecap="round"/>
+    <text x="${cx}" y="${cy+4}" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">${Math.round(pct*100)}%</text>
+  </svg>
+  <span class="ring-lbl" style="color:${c}">${label}</span><span class="ring-val">${current}/${target||'–'}</span></div>`;
+}
+function pbar(val,max,color){
+  const pct=max?Math.min(val/max*100,100):0;
+  return `<div class="pbar-wrap"><div class="pbar" style="width:${pct}%;background:${val>max&&max>0?'var(--red)':color}"></div></div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TAB SYSTEM
+// ══════════════════════════════════════════════════════════════════════════════
+function renderTabBar(){
+  document.getElementById('tabBar').innerHTML=TABS.map((t,i)=>`<button class="pill${state.tab===i?' on':''}" onclick="switchTab(${i})">${t}</button>`).join('');
+}
+function switchTab(i){state.tab=i;renderTabBar();renderMain()}
+function renderMain(){
+  const m=document.getElementById('main');
+  m.innerHTML='';
+  const div=document.createElement('div');div.className='tab';
+  const map=[dashHTML,macrosHTML,workoutsHTML,weightHTML,foodDBHTML];
+  div.innerHTML=(map[state.tab]||dashHTML)();
+  m.appendChild(div);
+  afterRender();
+}
+function afterRender(){
+  const mc=document.getElementById('macrosChartOuter');if(mc)drawMacrosChart(mc);
+  const wc=document.getElementById('weightChartOuter');if(wc)drawWeightChart(wc);
+  const wc2=document.getElementById('weightChartOuter2');if(wc2)drawWeightChart(wc2);
+  const wkc=document.getElementById('workoutChartOuter');if(wkc)drawWorkoutChart(wkc,wkProgressEx);
+  // scroll ai chat to bottom
+  const ac=document.getElementById('aiChat');if(ac)ac.scrollTop=ac.scrollHeight;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════════════════════════
+function dashHTML(){
+  const tdee=calcTDEE(),mt=getMT(),tot=getTotals(today()),p=state.profile;
+  const preset=GOAL_PRESETS[p.goal??2];
+  const wl=[...state.weightLog].sort((a,b)=>a.date.localeCompare(b.date));
+  const latest=wl.length?wl[wl.length-1].weight:null;
+  const prev=wl.length>1?wl[wl.length-2].weight:null;
+  const diff=latest&&prev?(+latest - +prev).toFixed(1):null;
+  return `<div class="dgrid">
+    <div class="card s2"><div class="ch"><h2>Profile & TDEE</h2><button class="btn btn-g" onclick="openProfile()">Edit</button></div>
+      ${tdee?`<div style="display:flex;align-items:baseline;gap:.42rem"><span class="tdee-num">${tdee}</span><span class="tdee-u">kcal/day</span></div>
+        <div class="tdee-d">${p.weight?`<span>${p.weight} lbs</span>`:''}${p.height?`<span>${p.height} in</span>`:''}${p.age?`<span>${p.age} yrs</span>`:''}
+        <span>${p.sex}</span><span>${ACTIVITY[p.activity||1].mult}×</span>
+        <span style="color:${preset.cleanBulk?'var(--green)':'var(--muted)'}">${preset.label}</span></div>
+        ${preset.cleanBulk?`<p style="font-size:.68rem;color:var(--green);margin-top:.38rem">🥦 Clean Bulk · ${getProtTarget().min}–${getProtTarget().max}g protein target</p>`:''}`
+      :`<p class="empty">Tap Edit to set up your profile</p>`}
+    </div>
+    <div class="card s2"><div class="ch"><span class="ct">Today — ${today()}</span></div>
+      <div class="rings">${ring('Cal',tot.cal,mt.cal.max,'#f59e0b')}${ring('Pro',tot.protein,mt.protein.max,'#6ee7b7')}${ring('Carbs',tot.carbs,mt.carbs.max,'#60a5fa')}${ring('Fat',tot.fat,mt.fat.max,'#f87171')}</div>
+      <div style="margin-top:.75rem">
+        <div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:.2rem"><span style="color:var(--muted)">Calories</span><span>${tot.cal} / ${mt.cal.max}</span></div>${pbar(tot.cal,mt.cal.max,'var(--amber)')}
+        <div style="display:flex;justify-content:space-between;font-size:.7rem;margin:.35rem 0 .2rem"><span style="color:var(--muted)">Protein</span><span>${tot.protein} / ${mt.protein.max}g</span></div>${pbar(tot.protein,mt.protein.max,'var(--green)')}
+      </div>
+    </div>
+    <div class="card"><div class="ch"><span class="ct">Weight</span></div>
+      <div class="wsnap"><span class="wb">${latest||'—'}</span><span class="wu">lbs</span>${diff!=null?`<span style="font-size:.78rem;font-weight:700;color:${+diff<0?'var(--green)':'var(--red)'};margin-left:.28rem">${+diff>0?'+':''}${diff}</span>`:''}</div>
+      <div class="chart-scroll-outer" id="weightChartOuter" style="margin-top:.45rem"></div>
+    </div>
+    <div class="card"><div class="ch"><span class="ct">Targets</span><button class="btn btn-g" onclick="openGoals()">Edit</button></div>
+      <div class="trows">
+        <div class="trow"><span>Calories</span><span class="bdg a">${state.goals.useCustomCal&&mt.cal.min?mt.cal.min+' – ':''} ${mt.cal.max} kcal</span></div>
+        <div class="trow"><span>Protein</span><span class="bdg g">${mt.protein.min?mt.protein.min+' – ':''} ${mt.protein.max}g</span></div>
+        <div class="trow"><span>Carbs</span><span class="bdg b">${mt.carbs.max}g</span></div>
+        <div class="trow"><span>Fat</span><span class="bdg r">${mt.fat.max}g</span></div>
+      </div>
+      ${preset.cleanBulk?`<p class="tnote">~1g protein/lb bodyweight</p>`:`<p class="tnote">30/40/30 P/C/F split</p>`}
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MACROS TAB
+// ══════════════════════════════════════════════════════════════════════════════
+let _macroDate=null;
+function macrosHTML(){
+  const date=_macroDate||today();
+  _macroDate=date;
+  const mt=getMT(),tot=getTotals(date),entries=state.macroLog[date]||[];
+  return `<div class="shdr"><h2>Macro Log</h2>
+    <input type="date" class="fi" style="width:auto;padding:.26rem .52rem;font-size:.76rem" id="macroDate" value="${date}" onchange="_macroDate=this.value;renderMain()">
+  </div>
+  <div class="rings" style="margin-bottom:.85rem">
+    ${ring('Cal',tot.cal,mt.cal.max,'#f59e0b')}${ring('Pro',tot.protein,mt.protein.max,'#6ee7b7')}${ring('Carbs',tot.carbs,mt.carbs.max,'#60a5fa')}${ring('Fat',tot.fat,mt.fat.max,'#f87171')}
+  </div>
+  <div class="card"><div class="ch"><span class="ct">Add Food</span></div>
+    <div class="frow">
+      <label class="fl" style="flex:2;min-width:115px">Food name
+        <input class="fi" id="fName" placeholder="Chicken breast" oninput="searchFoodDB(this.value)" autocomplete="off">
+        <div id="dbResults" class="food-res" style="display:none"></div>
+      </label>
+      <label class="fl">Qty<input class="fi" id="fQty" type="number" placeholder="1" value="1"></label>
+      <label class="fl">Unit<input class="fi" id="fUnit" placeholder="serving"></label>
+    </div>
+    <div class="frow" style="margin-top:.42rem">
+      <label class="fl">Cal<input class="fi" id="fCal" type="number" placeholder="165"></label>
+      <label class="fl">Protein(g)<input class="fi" id="fProt" type="number" placeholder="31"></label>
+      <label class="fl">Carbs(g)<input class="fi" id="fCarb" type="number" placeholder="0"></label>
+      <label class="fl">Fat(g)<input class="fi" id="fFat" type="number" placeholder="3.6"></label>
+    </div>
+    <div style="display:flex;gap:.42rem;flex-wrap:wrap;margin-top:.55rem">
+      <button class="btn btn-p" onclick="addFoodEntry('${date}')">+ Add</button>
+      <button class="btn btn-s" style="margin-top:.55rem" onclick="saveToDB()">💾 Save to DB</button>
+    </div>
+  </div>
+  <div class="card">${entries.length===0?`<div class="ch"><span class="ct">Log — ${date}</span></div><p class="empty">Nothing logged yet.</p>`:`
+    <div class="ch"><span class="ct">Log — ${date}</span><span class="bdg a">${tot.cal} kcal</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>Food</th><th>Qty</th><th>Cal</th><th>Pro</th><th>Carbs</th><th>Fat</th><th></th></tr></thead>
+      <tbody>
+        ${entries.map((e,i)=>`<tr>
+          <td style="font-weight:500;max-width:90px;word-break:break-word">${e.name}</td>
+          <td style="font-size:.7rem;color:var(--muted)">${e.qty||1}${e.unit?' '+e.unit:''}</td>
+          <td><span class="bdg a">${e.cal}</span></td><td><span class="bdg g">${e.protein}g</span></td><td><span class="bdg b">${e.carbs}g</span></td><td><span class="bdg r">${e.fat}g</span></td>
+          <td><button class="btn-x" onclick="removeFoodEntry('${date}',${i})">✕</button></td>
+        </tr>`).join('')}
+        <tr class="tfoot-row"><td colspan="2">Total</td><td><span class="bdg a">${tot.cal}</span></td><td><span class="bdg g">${tot.protein}g</span></td><td><span class="bdg b">${tot.carbs}g</span></td><td><span class="bdg r">${tot.fat}g</span></td><td></td></tr>
+      </tbody>
+    </table></div>`}
+  </div>
+  <div class="card"><div class="ch"><span class="ct">All-Time History</span><span style="font-size:.64rem;color:var(--muted)">← swipe · tap point</span></div>
+    <div class="chart-scroll-outer" id="macrosChartOuter"></div>
+    <div class="chart-legend">
+      <div class="cl-item"><div class="cl-dot" style="background:#f59e0b"></div>Calories</div>
+      <div class="cl-item"><div class="cl-dot" style="background:#6ee7b7"></div>Protein (g)</div>
+    </div>
+  </div>`;
+}
+
+function searchFoodDB(q){
+  const res=document.getElementById('dbResults');
+  if(!q||q.length<2){res.style.display='none';return}
+  const matches=state.foodDB.filter(f=>f.name.toLowerCase().includes(q.toLowerCase())).slice(0,8);
+  if(!matches.length){res.style.display='none';return}
+  res.style.display='block';
+  res.innerHTML=matches.map(f=>`<div class="food-res-item" onclick="fillFromDB(${state.foodDB.indexOf(f)})">
+    <div class="fi-name">${f.name}</div>
+    <div class="fi-macro">${f.cal} kcal · ${f.protein}g P · ${f.carbs}g C · ${f.fat}g F · per ${f.unit||'serving'}</div>
+  </div>`).join('');
+}
+function fillFromDB(idx){
+  const f=state.foodDB[idx];if(!f)return;
+  document.getElementById('fName').value=f.name;
+  document.getElementById('fUnit').value=f.unit||'serving';
+  document.getElementById('fCal').value=f.cal;
+  document.getElementById('fProt').value=f.protein;
+  document.getElementById('fCarb').value=f.carbs;
+  document.getElementById('fFat').value=f.fat;
+  document.getElementById('dbResults').style.display='none';
+}
+function saveToDB(){
+  const name=document.getElementById('fName').value.trim();if(!name)return;
+  const entry={name,unit:document.getElementById('fUnit').value||'serving',
+    cal:+document.getElementById('fCal').value||0,protein:+document.getElementById('fProt').value||0,
+    carbs:+document.getElementById('fCarb').value||0,fat:+document.getElementById('fFat').value||0};
+  const idx=state.foodDB.findIndex(f=>f.name.toLowerCase()===name.toLowerCase());
+  if(idx>=0)state.foodDB[idx]=entry;else state.foodDB.push(entry);
+  save('foodDB');toast(`"${name}" saved to DB`);
+}
+function addFoodEntry(date){
+  const name=document.getElementById('fName').value.trim();if(!name)return;
+  const qty=+document.getElementById('fQty').value||1;
+  const entry={name,qty,unit:document.getElementById('fUnit').value||'serving',
+    cal:Math.round((+document.getElementById('fCal').value||0)*qty),
+    protein:Math.round((+document.getElementById('fProt').value||0)*qty),
+    carbs:Math.round((+document.getElementById('fCarb').value||0)*qty),
+    fat:Math.round((+document.getElementById('fFat').value||0)*qty)};
+  if(!state.macroLog[date])state.macroLog[date]=[];
+  state.macroLog[date].push(entry);
+  save('macroLog');toast('Food logged!');renderMain();
+}
+function removeFoodEntry(date,idx){
+  state.macroLog[date].splice(idx,1);save('macroLog');renderMain();
+}
+function drawMacrosChart(outer){
+  const dates=Object.keys(state.macroLog).filter(d=>(state.macroLog[d]||[]).length>0).sort();
+  if(!dates.length){outer.innerHTML='<p class="empty" style="padding:.7rem">Log food to see history.</p>';return;}
+  const mt=getMT();
+  makeScrollChart(outer.id,[
+    {data:dates.map(d=>getTotals(d).cal||null),color:'#f59e0b',fill:true,targetMax:mt.cal.max,targetMin:mt.cal.min||mt.cal.max*0.85},
+    {data:dates.map(d=>getTotals(d).protein||null),color:'#6ee7b7',fill:false,targetMax:mt.protein.max,targetMin:mt.protein.min||0}
+  ],dates,{height:CHART_H});
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// WORKOUTS TAB
+// ══════════════════════════════════════════════════════════════════════════════
+let wkView='log',wkProgressEx='',_wkDate=null;
+function workoutsHTML(){
+  return `<div class="shdr"><h2>Workouts</h2>
+    <div class="toggle-r">
+      <button class="pill${wkView==='log'?' on':''}" onclick="wkView='log';renderMain()">Log</button>
+      <button class="pill${wkView==='progress'?' on':''}" onclick="wkView='progress';renderMain()">Progress</button>
+    </div></div>
+  ${wkView==='log'?workoutLogHTML():workoutProgressHTML()}`;
+}
+function workoutLogHTML(){
+  const date=_wkDate||today();_wkDate=date;
+  const dw=state.workouts[date]||[];
+  return `<div style="margin-bottom:.7rem"><input type="date" class="fi" style="width:auto;padding:.26rem .52rem;font-size:.76rem" id="wkDate" value="${date}" onchange="_wkDate=this.value;renderMain()"></div>
+  <div class="card"><span class="ct">Add Exercise</span>
+    <div class="frow" style="margin-top:.42rem"><label class="fl" style="flex:2">Exercise<input class="fi" id="exName" placeholder="Bench Press" list="exList"></label></div>
+    <datalist id="exList">${getAllExercises().map(e=>`<option value="${e}">`).join('')}</datalist>
+    <button class="btn btn-p" onclick="addExercise('${date}')">+ Add Exercise</button>
+  </div>
+  ${dw.length===0?`<p class="empty" style="margin-top:.85rem">No exercises logged.</p>`:''}
+  ${dw.map((ex,ei)=>`<div class="card" style="margin-top:.7rem">
+    <div class="ch"><span style="font-weight:700">${ex.exercise}</span><button class="btn-x" onclick="removeExercise('${date}',${ei})">✕</button></div>
+    <div class="sets">${ex.sets.map((s,si)=>`<div class="srow"><span class="snum">Set ${si+1}</span>
+      <span class="bdg b">${s.reps} reps</span><span class="bdg a">${s.weight} lbs</span><span class="bdg g">${s.reps*s.weight} vol</span>
+      <button class="btn-x" onclick="removeSet('${date}',${ei},${si})">✕</button></div>`).join('')}</div>
+    <div class="frow">
+      <label class="fl">Reps<input class="fi" id="reps_${ei}" type="number" placeholder="8"></label>
+      <label class="fl">Weight (lbs)<input class="fi" id="wgt_${ei}" type="number" placeholder="135"></label>
+      <button class="btn btn-s" style="align-self:flex-end;margin-bottom:1px" onclick="addSet('${date}',${ei})">+ Set</button>
+    </div></div>`).join('')}`;
+}
+function workoutProgressHTML(){
+  const exs=getAllExercises();
+  if(!wkProgressEx&&exs.length)wkProgressEx=exs[0];
+  const pd=getProgressData(wkProgressEx);
+  return `<div class="card"><label class="fl">Exercise
+    <select class="fi" onchange="wkProgressEx=this.value;renderMain()">
+      <option value="">-- select --</option>
+      ${exs.map(e=>`<option value="${e}"${e===wkProgressEx?' selected':''}>${e}</option>`).join('')}
+    </select></label></div>
+  ${wkProgressEx&&pd.length>0?`<div class="card" style="margin-top:.7rem">
+    <div class="ch"><span class="ct">Max Weight — ${wkProgressEx}</span><span class="bdg b">PR: ${Math.max(...pd.map(d=>d.maxW))} lbs</span></div>
+    <div class="chart-scroll-outer" id="workoutChartOuter"></div>
+    <div class="chart-legend"><div class="cl-item"><div class="cl-dot" style="background:#60a5fa"></div>Max Weight</div><div class="cl-item"><div class="cl-dot" style="background:#a78bfa"></div>Vol ÷ 10</div></div>
+    <p class="chart-hint">← swipe to see all sessions</p>
+    <div class="tw" style="margin-top:.7rem"><table>
+      <thead><tr><th>Date</th><th>Max Weight</th><th>Max Volume</th></tr></thead>
+      <tbody>${[...pd].reverse().map(d=>`<tr><td>${d.date}</td><td><span class="bdg b">${d.maxW} lbs</span></td><td><span class="bdg v">${d.maxVol}</span></td></tr>`).join('')}</tbody>
+    </table></div></div>`:`<p class="empty" style="margin-top:.85rem">${wkProgressEx?'No data yet.':'Select an exercise.'}</p>`}`;
+}
+function getAllExercises(){return[...new Set(Object.values(state.workouts).flat().map(w=>w.exercise))].sort()}
+function getProgressData(ex){
+  if(!ex)return[];
+  return Object.entries(state.workouts).sort(([a],[b])=>a.localeCompare(b))
+    .flatMap(([d,exs])=>exs.filter(e=>e.exercise===ex).map(e=>({date:d,maxW:Math.max(...e.sets.map(s=>s.weight),0),maxVol:Math.max(...e.sets.map(s=>s.reps*s.weight),0)})));
+}
+function drawWorkoutChart(outer,ex){
+  const pd=getProgressData(ex);
+  if(!pd.length){outer.innerHTML='';return;}
+  makeScrollChart(outer.id,[{data:pd.map(d=>d.maxW),color:'#60a5fa',fill:true},{data:pd.map(d=>d.maxVol/10),color:'#a78bfa',fill:false}],pd.map(d=>d.date),{height:CHART_H});
+}
+function addExercise(date){const name=document.getElementById('exName')?.value.trim();if(!name)return;if(!state.workouts[date])state.workouts[date]=[];state.workouts[date].push({exercise:name,sets:[]});save('workouts');renderMain()}
+function removeExercise(date,ei){state.workouts[date].splice(ei,1);save('workouts');renderMain()}
+function addSet(date,ei){const r=+document.getElementById(`reps_${ei}`)?.value||0,w=+document.getElementById(`wgt_${ei}`)?.value||0;if(!r)return;state.workouts[date][ei].sets.push({reps:r,weight:w});save('workouts');renderMain()}
+function removeSet(date,ei,si){state.workouts[date][ei].sets.splice(si,1);save('workouts');renderMain()}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// WEIGHT TAB
+// ══════════════════════════════════════════════════════════════════════════════
+function weightHTML(){
+  const wl=[...state.weightLog].sort((a,b)=>a.date.localeCompare(b.date));
+  const latest=wl.length?+wl[wl.length-1].weight:null;
+  const start=wl.length?+wl[0].weight:null;
+  const totalDiff=start&&latest?(latest-start).toFixed(1):null;
+  return `<h2 style="margin-bottom:.8rem">Weight Log</h2>
+  <div class="dgrid" style="margin-bottom:.75rem">
+    <div class="card"><span class="ct">Current</span><div class="wsnap" style="margin-top:.32rem"><span class="wb">${latest||'—'}</span><span class="wu">lbs</span></div></div>
+    <div class="card"><span class="ct">Total Change</span><div class="wsnap" style="margin-top:.32rem">
+      <span class="wb" style="color:${+totalDiff<0?'var(--green)':+totalDiff>0?'var(--red)':'var(--purple)'}">${totalDiff!=null?(+totalDiff>0?'+':'')+totalDiff:'—'}</span><span class="wu">lbs</span>
+    </div></div>
+  </div>
+  <div class="card" style="margin-bottom:.75rem"><div class="ch"><span class="ct">All-Time Trend</span><span style="font-size:.64rem;color:var(--muted)">← swipe · tap point</span></div>
+    <div class="chart-scroll-outer" id="weightChartOuter2"></div>
+  </div>
+  <div class="card" style="margin-bottom:.75rem"><div class="ch"><span class="ct">Log Weight</span></div>
+    <div class="frow">
+      <label class="fl">Date<input class="fi" type="date" id="wDate" value="${today()}"></label>
+      <label class="fl">Weight (lbs)<input class="fi" type="number" id="wVal" placeholder="175.5" step="0.1"></label>
+    </div>
+    <button class="btn btn-p" onclick="logWeight()">+ Log Weight</button>
+  </div>
+  <div class="card"><div class="ch"><span class="ct">History (${wl.length})</span></div>
+    ${wl.length===0?`<p class="empty">No entries yet.</p>`:`<div class="tw"><table>
+      <thead><tr><th>Date</th><th>Weight</th><th>Change</th><th></th></tr></thead>
+      <tbody>${[...wl].reverse().map((e,i,arr)=>{
+        const prevE=arr[i+1];const delta=prevE?(+e.weight - +prevE.weight).toFixed(1):null;
+        return `<tr>
+          <td style="cursor:pointer;color:var(--blue)" onclick="openDayDetail('${e.date}')">${e.date}</td>
+          <td><span class="bdg v">${e.weight} lbs</span></td>
+          <td>${delta!=null?`<span class="bdg ${+delta<0?'g':+delta>0?'r':'a'}">${+delta>0?'+':''}${delta}</span>`:'—'}</td>
+          <td><button class="btn-x" onclick="removeWeight('${e.date}')">✕</button></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`}
+  </div>`;
+}
+function drawWeightChart(outer){
+  const wl=[...state.weightLog].sort((a,b)=>a.date.localeCompare(b.date));
+  if(wl.length<2){outer.innerHTML='<p class="empty" style="padding:.55rem">Need 2+ entries.</p>';return;}
+  makeScrollChart(outer.id,[{data:wl.map(d=>+d.weight),color:'#a78bfa',fill:true}],wl.map(d=>d.date),{height:130});
+}
+function logWeight(){
+  const date=document.getElementById('wDate')?.value||today();
+  const val=document.getElementById('wVal')?.value;if(!val)return;
+  const idx=state.weightLog.findIndex(e=>e.date===date);
+  if(idx>=0)state.weightLog[idx].weight=val;else state.weightLog.push({date,weight:val});
+  state.weightLog.sort((a,b)=>a.date.localeCompare(b.date));
+  save('weightLog');toast('Weight logged!');renderMain();
+}
+function removeWeight(date){state.weightLog=state.weightLog.filter(e=>e.date!==date);save('weightLog');renderMain()}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// FOOD DATABASE TAB
+// ══════════════════════════════════════════════════════════════════════════════
+let dbSearch='',dbEditIdx=-1;
+function foodDBHTML(){
+  const q=dbSearch.toLowerCase();
+  const items=state.foodDB.filter(f=>!q||f.name.toLowerCase().includes(q));
+  return `<div class="shdr"><h2>Food DB</h2><span class="bdg g">${state.foodDB.length} items</span></div>
+  <div class="card">
+    <input class="fi" placeholder="Search foods…" value="${dbSearch}" oninput="dbSearch=this.value;renderMain()" style="margin-bottom:.5rem">
+    <button class="btn btn-p" style="margin-top:0" onclick="openAddFoodDB()">+ Add New Food</button>
+  </div>
+  ${items.length===0?`<p class="empty">${state.foodDB.length===0?'No foods in DB yet.':'No matches.'}</p>`:''}
+  ${items.map(f=>{
+    const idx=state.foodDB.indexOf(f);
+    return `<div class="db-item">
+      <div class="db-item-info">
+        <div class="db-item-name">${f.name}</div>
+        <div class="db-item-macros">${f.cal} kcal · ${f.protein}g P · ${f.carbs}g C · ${f.fat}g F · per ${f.unit||'serving'}</div>
+      </div>
+      <div class="db-item-actions">
+        <button class="btn btn-g" onclick="openEditFoodDB(${idx})">Edit</button>
+        <button class="btn btn-danger" onclick="deleteFoodDB(${idx})">Delete</button>
+      </div>
+    </div>`;
+  }).join('')}`;
+}
+function openAddFoodDB(){
+  openFoodDBModal(-1,{name:'',cal:'',protein:'',carbs:'',fat:'',unit:'serving'});
+}
+function openEditFoodDB(idx){
+  openFoodDBModal(idx,{...state.foodDB[idx]});
+}
+function openFoodDBModal(idx,f){
+  const isEdit=idx>=0;
+  const modal=document.createElement('div');modal.className='modal-bg';modal.id='dbModal';
+  modal.innerHTML=`<div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem">
+      <h3>${isEdit?'Edit Food':'Add Food'}</h3>
+      <button class="btn btn-g" onclick="closeModal('dbModal')">✕</button>
+    </div>
+    <div class="frow" style="margin-bottom:.5rem">
+      <label class="fl" style="flex:2">Name<input class="fi" id="dbf_name" value="${f.name}" placeholder="Chicken breast"></label>
+      <label class="fl">Unit<input class="fi" id="dbf_unit" value="${f.unit||'serving'}" placeholder="serving"></label>
+    </div>
+    <div class="frow" style="margin-bottom:.7rem">
+      <label class="fl">Cal<input class="fi" id="dbf_cal" type="number" value="${f.cal||''}" placeholder="165"></label>
+      <label class="fl">Protein(g)<input class="fi" id="dbf_prot" type="number" value="${f.protein||''}" placeholder="31"></label>
+      <label class="fl">Carbs(g)<input class="fi" id="dbf_carb" type="number" value="${f.carbs||''}" placeholder="0"></label>
+      <label class="fl">Fat(g)<input class="fi" id="dbf_fat" type="number" value="${f.fat||''}" placeholder="3.6"></label>
+    </div>
+    <button class="btn btn-p" style="width:100%" onclick="saveFoodDBModal(${idx})">${isEdit?'Save Changes':'Add to DB'}</button>
+    ${isEdit?`<button class="btn btn-danger" style="width:100%;margin-top:.45rem;border-radius:var(--rs);padding:.48rem 1rem" onclick="deleteFoodDB(${idx});closeModal('dbModal')">🗑 Delete this food</button>`:''}
+  </div>`;
+  document.body.appendChild(modal);
+}
+function saveFoodDBModal(idx){
+  const name=document.getElementById('dbf_name').value.trim();if(!name)return;
+  const entry={name,unit:document.getElementById('dbf_unit').value||'serving',
+    cal:+document.getElementById('dbf_cal').value||0,protein:+document.getElementById('dbf_prot').value||0,
+    carbs:+document.getElementById('dbf_carb').value||0,fat:+document.getElementById('dbf_fat').value||0};
+  if(idx>=0)state.foodDB[idx]=entry;else state.foodDB.push(entry);
+  save('foodDB');closeModal('dbModal');toast(idx>=0?'Food updated!':'Food added!');renderMain();
+}
+function deleteFoodDB(idx){
+  if(!confirm(`Delete "${state.foodDB[idx].name}" from DB?`))return;
+  state.foodDB.splice(idx,1);save('foodDB');toast('Deleted','var(--red)');renderMain();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MODALS — Profile & Goals
+// ══════════════════════════════════════════════════════════════════════════════
+function openProfile(){
+  const p=state.profile;
+  const modal=document.createElement('div');modal.className='modal-bg';modal.id='profileModal';
+  modal.innerHTML=`<div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem">
+      <h3>Profile & TDEE</h3><button class="btn btn-g" onclick="closeModal('profileModal')">✕</button>
+    </div>
+    <div class="frow">
+      <label class="fl">Weight (lbs)<input class="fi" id="p_w" type="number" value="${p.weight}" placeholder="180"></label>
+      <label class="fl">Height (in)<input class="fi" id="p_h" type="number" value="${p.height}" placeholder="70"></label>
+      <label class="fl">Age<input class="fi" id="p_a" type="number" value="${p.age}" placeholder="22"></label>
+    </div>
+    <div class="frow" style="margin-top:.5rem">
+      <label class="fl">Sex<select class="fi" id="p_s"><option value="male"${p.sex==='male'?' selected':''}>Male</option><option value="female"${p.sex==='female'?' selected':''}>Female</option></select></label>
+      <label class="fl" style="flex:2">Activity<select class="fi" id="p_act">${ACTIVITY.map((a,i)=>`<option value="${i}"${i===p.activity?' selected':''}>${a.label}</option>`).join('')}</select></label>
+    </div>
+    <div class="frow" style="margin-top:.5rem">
+      <label class="fl" style="flex:2">Goal<select class="fi" id="p_g">${GOAL_PRESETS.map((g,i)=>`<option value="${i}"${i===p.goal?' selected':''}>${g.label}</option>`).join('')}</select></label>
+    </div>
+    <p style="font-size:.68rem;color:var(--muted);margin-top:.42rem">Clean Bulk = +150 kcal · protein ~1g/lb bodyweight</p>
+    <button class="btn btn-p" style="width:100%" onclick="saveProfile()">Save Profile</button>
+  </div>`;
+  document.body.appendChild(modal);
+}
+function saveProfile(){
+  state.profile={weight:document.getElementById('p_w').value,height:document.getElementById('p_h').value,
+    age:document.getElementById('p_a').value,sex:document.getElementById('p_s').value,
+    activity:+document.getElementById('p_act').value,goal:+document.getElementById('p_g').value};
+  save('profile');closeModal('profileModal');toast('Profile saved!');renderMain();
+}
+function openGoals(){
+  const g=state.goals;
+  const modal=document.createElement('div');modal.className='modal-bg';modal.id='goalsModal';
+  modal.innerHTML=`<div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem">
+      <h3>Custom Targets</h3><button class="btn btn-g" onclick="closeModal('goalsModal')">✕</button>
+    </div>
+    <p style="font-size:.74rem;color:var(--muted);margin-bottom:.85rem">Override TDEE targets. Uncheck to use auto-calculated values.</p>
+    <div style="display:flex;align-items:center;gap:.52rem;margin-bottom:.42rem">
+      <input type="checkbox" id="g_uc" ${g.useCustomCal?'checked':''} style="width:16px;height:16px;accent-color:var(--amber)">
+      <label for="g_uc" style="font-weight:700;font-size:.8rem">Custom Calorie Range</label>
+    </div>
+    <div class="frow" style="margin-bottom:.85rem">
+      <label class="fl">Min Cal<input class="fi" id="g_cmin" type="number" value="${g.calMin||''}" placeholder="1800"></label>
+      <label class="fl">Max Cal<input class="fi" id="g_cmax" type="number" value="${g.calMax||''}" placeholder="2200"></label>
+    </div>
+    <div style="display:flex;align-items:center;gap:.52rem;margin-bottom:.42rem">
+      <input type="checkbox" id="g_up" ${g.useCustomProt?'checked':''} style="width:16px;height:16px;accent-color:var(--green)">
+      <label for="g_up" style="font-weight:700;font-size:.8rem">Custom Protein Range</label>
+    </div>
+    <div class="frow" style="margin-bottom:1rem">
+      <label class="fl">Min Protein (g)<input class="fi" id="g_pmin" type="number" value="${g.protMin||''}" placeholder="140"></label>
+      <label class="fl">Max Protein (g)<input class="fi" id="g_pmax" type="number" value="${g.protMax||''}" placeholder="180"></label>
+    </div>
+    <button class="btn btn-p" style="width:100%" onclick="saveGoals()">Save Targets</button>
+  </div>`;
+  document.body.appendChild(modal);
+}
+function saveGoals(){
+  state.goals={useCustomCal:document.getElementById('g_uc').checked,calMin:+document.getElementById('g_cmin').value||0,
+    calMax:+document.getElementById('g_cmax').value||0,useCustomProt:document.getElementById('g_up').checked,
+    protMin:+document.getElementById('g_pmin').value||0,protMax:+document.getElementById('g_pmax').value||0};
+  save('goals');closeModal('goalsModal');toast('Targets saved!');renderMain();
+}
+function closeModal(id){const m=document.getElementById(id);if(m)m.remove()}
+document.addEventListener('click',e=>{if(e.target.classList.contains('modal-bg'))e.target.remove()});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SERVICE WORKER (offline)
+// ══════════════════════════════════════════════════════════════════════════════
+if('serviceWorker' in navigator){
+  const sw=`const C='macrobot-v1';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['.']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const cl=res.clone();caches.open(C).then(c=>c.put(e.request,cl));return res}))));`;
+  const blob=new Blob([sw],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════════════════
+renderTabBar();renderMain();
+window.addEventListener('resize',()=>afterRender());
+</script>
+</body>
+</html>
