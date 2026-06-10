@@ -248,7 +248,7 @@ function makeScrollChart(containerId,datasets,labels,opts={}){
   function yp(v){return PAD.t+ch-((v-ymin)/(ymax-ymin))*ch}
   ctx.fillStyle='#111120'; ctx.fillRect(0,0,totalW,H);
   ctx.strokeStyle='#ffffff08'; ctx.lineWidth=1;
-  for(let i=0;i<=4;i++){const v=ymin+(ymax-ymin)*(i/4),y=yp(v);ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cw,y);ctx.stroke();ctx.fillStyle='#6b6b8a';ctx.font='10px DM Sans,sans-serif';ctx.textAlign='right';ctx.fillText(Math.round(v),PAD.l-8,y+3);}
+  for(let i=0;i<=4;i++){const v=ymin+(ymax-ymin)*(i/4),y=yp(v);ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cw,y);ctx.stroke();ctx.fillStyle='#6b6b8a';ctx.font='10px DM Sans,sans-serif';ctx.textAlign='right';const label=(v%1===0)?Math.round(v):v.toFixed(1);ctx.fillText(label,PAD.l-8,y+3);}
   const step=Math.max(1,Math.ceil(nPts/Math.floor(cw/38)));
   ctx.fillStyle='#6b6b8a';ctx.font='9px DM Sans,sans-serif';ctx.textAlign='center';
   labels.forEach((lbl,i)=>{if(i%step===0||i===nPts-1)ctx.fillText(lbl.slice(5),xp(i),H-PAD.b+13);});
@@ -361,7 +361,7 @@ function afterRender(){
   const ac=document.getElementById('aiChat');if(ac)ac.scrollTop=ac.scrollHeight;
 }
 
-// ═════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════��══════════════════════════════════
 // DASHBOARD
 // ═════════════════════════════════════════════════════════════════════
 let _dashDate=null;
@@ -725,10 +725,10 @@ function closeModal(id){const m=document.getElementById(id);if(m)m.remove()}
 document.addEventListener('click',e=>{if(e.target.classList.contains('modal-bg'))e.target.remove()});
 
 // ═════════════════════════════════════════════════════════════════════
-// SERVICE WORKER (offline)
+// SERVICE WORKER (offline) — FORCE CACHE UPDATE
 // ═════════════════════════════════════════════════════════════════════
 if('serviceWorker' in navigator){
-  const sw=`const C='macrobot-v1';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['.']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
+  const sw=`const C='macrobot-v2';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['.']))));self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!=='macrobot-v2').map(k=>caches.delete(k))))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
   const blob=new Blob([sw],{type:'application/javascript'});
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
 }
