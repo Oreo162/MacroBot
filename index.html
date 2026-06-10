@@ -26,7 +26,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .logo{font-family:var(--font-d);font-size:1.6rem;color:var(--amber);letter-spacing:.06em;line-height:1;flex-shrink:0}
 .tab-bar{display:flex;gap:.28rem;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex:1}
 .tab-bar::-webkit-scrollbar{display:none}
-.pill{background:transparent;border:1px solid var(--border);color:var(--muted);padding:.24rem .6rem;border-radius:999px;font-family:var(--font-b);font-size:.7rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0}
+.pill{background:transparent;border:1px solid var(--border);color:var(--muted);padding:.24rem .6rem;border-radius:999px;font-family:var(--font-b);font-size:.7rem;font-weight:600;cursor:pointer;white-space:nowrap}
 .pill:active{opacity:.7}.pill.on{background:var(--amber);border-color:var(--amber);color:#000}
 .main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:1rem 1rem calc(var(--safe-bot) + 1.5rem)}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:.8rem}
@@ -35,7 +35,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 h2{font-family:var(--font-d);font-size:1.5rem;letter-spacing:.04em}
 .frow{display:flex;gap:.5rem;flex-wrap:wrap}
 .fl{display:flex;flex-direction:column;gap:.24rem;font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;flex:1;min-width:82px}
-.fi{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);padding:.46rem .6rem;font-family:var(--font-b);font-size:.84rem;outline:none;width:100%;transition:border-color .15s;-webkit-appearance:none}
+.fi{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);padding:.46rem .6rem;font-family:var(--font-b);font-size:.84rem;outline:none;width:100%;transition:border-color .15s}
 .fi:focus{border-color:var(--amber)}select.fi{cursor:pointer}
 textarea.fi{resize:vertical;min-height:80px;line-height:1.4}
 .btn{border:none;border-radius:var(--rs);font-family:var(--font-b);font-weight:700;font-size:.78rem;cursor:pointer;transition:opacity .15s;-webkit-tap-highlight-color:transparent}
@@ -99,7 +99,7 @@ canvas{display:block}
 .toggle-r{display:flex;gap:.3rem}
 .tab{animation:fi .2s ease}
 @keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-#toast{position:fixed;bottom:calc(var(--safe-bot) + 3.8rem);left:50%;transform:translateX(-50%) translateY(18px);background:var(--green);color:#000;padding:.36rem .9rem;border-radius:999px;font-weight:700;font-size:.76rem;opacity:0;transition:all .22s;pointer-events:none;z-index:999;white-space:nowrap}
+#toast{position:fixed;bottom:calc(var(--safe-bot) + 3.8rem);left:50%;transform:translateX(-50%) translateY(18px);background:var(--green);color:#000;padding:.36rem .9rem;border-radius:999px;font-weight:700;font-size:.75rem;z-index:300;opacity:0;transition:opacity .2s,transform .2s}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .modal{background:var(--surface);border-radius:var(--r) var(--r) 0 0;padding:1.25rem 1rem calc(var(--safe-bot) + 1.25rem);width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
@@ -124,22 +124,21 @@ canvas{display:block}
 </div>
 <div id="toast"></div>
 <script>
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // STORAGE — always persists to localStorage
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 const S={
   get(k){try{const v=localStorage.getItem('forge_'+k);return v?JSON.parse(v):null}catch{return null}},
   set(k,v){try{localStorage.setItem('forge_'+k,JSON.stringify(v));return true}catch(e){console.warn('Storage full?',e);return false}}
 };
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // STATE — loaded from localStorage on startup
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 let state={
   tab:0,
   profile:    S.get('profile')  ||{weight:'',height:'',age:'',sex:'male',activity:1,goal:2},
   macroLog:   S.get('macroLog') ||{},   // {date:[{name,cal,protein,carbs,fat,qty,unit}]}
-  workouts:   S.get('workouts') ||{},   // {date:[{exercise,sets:[{reps,weight}]}]}
   weightLog:  S.get('weightLog')||[],   // [{date,weight}]
   foodDB:     S.get('foodDB')   ||[],   // [{name,cal,protein,carbs,fat,unit}]
   goals:      S.get('goals')    ||{calMin:0,calMax:0,protMin:0,protMax:0,useCustomCal:false,useCustomProt:false}
@@ -153,11 +152,11 @@ function save(k){
 window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') saveAll()});
 window.addEventListener('pagehide',saveAll);
 window.addEventListener('beforeunload',saveAll);
-function saveAll(){['profile','macroLog','workouts','weightLog','foodDB','goals'].forEach(k=>save(k))}
+function saveAll(){['profile','macroLog','weightLog','foodDB','goals'].forEach(k=>save(k))}
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // CONSTANTS
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 const ACTIVITY=[
   {label:'Sedentary (desk job)',mult:1.2},
   {label:'Lightly active (1–3x/wk)',mult:1.375},
@@ -174,11 +173,11 @@ const GOAL_PRESETS=[
   {label:'Bulk (+500 kcal)',delta:500},
   {label:'Custom',delta:0,custom:true}
 ];
-const TABS=['Dashboard','Macros','Workouts','Weight','Food DB'];
+const TABS=['Dashboard','Macros','Weight','Food DB'];
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // TDEE / TARGETS
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 function calcTDEE(){
   const p=state.profile;
   if(!p.weight||!p.height||!p.age) return null;
@@ -206,9 +205,9 @@ function getTotals(date){
   return (state.macroLog[date]||[]).reduce((a,i)=>({cal:a.cal+(+i.cal||0),protein:a.protein+(+i.protein||0),carbs:a.carbs+(+i.carbs||0),fat:a.fat+(+i.fat||0)}),{cal:0,protein:0,carbs:0,fat:0});
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // TOAST
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 function toast(msg,color){
   const t=document.getElementById('toast');
   t.textContent=msg;
@@ -218,9 +217,9 @@ function toast(msg,color){
   setTimeout(()=>t.classList.remove('show'),2000);
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // SCROLLABLE CANVAS CHART
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 const MIN_PX=22,CHART_H=155,PAD={t:12,r:14,b:32,l:44};
 
 function makeScrollChart(containerId,datasets,labels,opts={}){
@@ -249,15 +248,15 @@ function makeScrollChart(containerId,datasets,labels,opts={}){
   function yp(v){return PAD.t+ch-((v-ymin)/(ymax-ymin))*ch}
   ctx.fillStyle='#111120'; ctx.fillRect(0,0,totalW,H);
   ctx.strokeStyle='#ffffff08'; ctx.lineWidth=1;
-  for(let i=0;i<=4;i++){const v=ymin+(ymax-ymin)*(i/4),y=yp(v);ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cw,y);ctx.stroke();ctx.fillStyle='#6b6b8a';ctx.font='10px DM Sans,sans-serif';ctx.textAlign='right';ctx.fillText(Math.round(v),PAD.l-4,y+3);}
+  for(let i=0;i<=4;i++){const v=ymin+(ymax-ymin)*(i/4),y=yp(v);ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+cw,y);ctx.stroke();ctx.fillStyle='#6b6b8a';ctx.font='10px DM Sans,sans-serif';ctx.textAlign='right';ctx.fillText(Math.round(v),PAD.l-8,y+3);}
   const step=Math.max(1,Math.ceil(nPts/Math.floor(cw/38)));
   ctx.fillStyle='#6b6b8a';ctx.font='9px DM Sans,sans-serif';ctx.textAlign='center';
   labels.forEach((lbl,i)=>{if(i%step===0||i===nPts-1)ctx.fillText(lbl.slice(5),xp(i),H-PAD.b+13);});
   labels.forEach((lbl,i)=>{if(lbl.slice(8)==='01'){ctx.strokeStyle='#ffffff05';ctx.beginPath();ctx.moveTo(xp(i),PAD.t);ctx.lineTo(xp(i),PAD.t+ch);ctx.stroke();}});
   datasets.forEach(ds=>{
     const pts=ds.data.map((v,i)=>v!=null&&!isNaN(v)?{x:xp(i),y:yp(v),v,i}:null);
-    if(ds.targetMax!=null){ctx.save();ctx.globalAlpha=.07;ctx.fillStyle=ds.color;ctx.fillRect(PAD.l,yp(Math.min(ds.targetMax,ymax)),cw,yp(Math.max(ds.targetMin||0,ymin))-yp(Math.min(ds.targetMax,ymax)));ctx.restore();ctx.save();ctx.strokeStyle=ds.color;ctx.globalAlpha=.2;ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(PAD.l,yp(ds.targetMax));ctx.lineTo(PAD.l+cw,yp(ds.targetMax));ctx.stroke();ctx.restore();ctx.setLineDash([]);}
-    if(ds.fill){const vp=pts.filter(Boolean);if(vp.length>1){ctx.beginPath();ctx.moveTo(vp[0].x,PAD.t+ch);vp.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(vp[vp.length-1].x,PAD.t+ch);ctx.closePath();const g=ctx.createLinearGradient(0,PAD.t,0,PAD.t+ch);g.addColorStop(0,ds.color+'38');g.addColorStop(1,ds.color+'00');ctx.fillStyle=g;ctx.fill();}}
+    if(ds.targetMax!=null){ctx.save();ctx.globalAlpha=.07;ctx.fillStyle=ds.color;ctx.fillRect(PAD.l,yp(Math.min(ds.targetMax,ymax)),cw,yp(Math.max(ds.targetMin||0,ymin))-yp(Math.min(ds.targetMax,ymax)));ctx.restore();}
+    if(ds.fill){const vp=pts.filter(Boolean);if(vp.length>1){ctx.beginPath();ctx.moveTo(vp[0].x,PAD.t+ch);vp.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(vp[vp.length-1].x,PAD.t+ch);ctx.closePath();ctx.fillStyle=ds.color;ctx.globalAlpha=.1;ctx.fill();ctx.globalAlpha=1;}}
     ctx.beginPath();ctx.strokeStyle=ds.color;ctx.lineWidth=2.2;ctx.lineJoin='round';let pen=false;pts.forEach(p=>{if(!p){pen=false;return}pen?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);pen=true;});ctx.stroke();
     pts.forEach(p=>{if(!p)return;ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fillStyle=ds.color;ctx.fill();});
   });
@@ -276,9 +275,9 @@ document.addEventListener('click',e=>{
   if(best>=0&&bestDist<MIN_PX*2)openDayDetail(canvas._labels[best]);
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // DAY DETAIL MODAL
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 function openDayDetail(date){
   const entries=state.macroLog[date]||[];
   const wEntry=state.weightLog.find(w=>w.date===date);
@@ -318,9 +317,9 @@ function openDayDetail(date){
 }
 function jumpToMacros(date){state.tab=1;_macroDate=date;renderTabBar();renderMain()}
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // RING SVG
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 function ring(label,current,target,color){
   const pct=target?Math.min(current/target,1):0;
   const r=25,cx=31,cy=31,circ=2*Math.PI*r,dash=pct*circ;
@@ -337,9 +336,9 @@ function pbar(val,max,color){
   return `<div class="pbar-wrap"><div class="pbar" style="width:${pct}%;background:${val>max&&max>0?'var(--red)':color}"></div></div>`;
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // TAB SYSTEM
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 function renderTabBar(){
   document.getElementById('tabBar').innerHTML=TABS.map((t,i)=>`<button class="pill${state.tab===i?' on':''}" onclick="switchTab(${i})">${t}</button>`).join('');
 }
@@ -348,25 +347,27 @@ function renderMain(){
   const m=document.getElementById('main');
   m.innerHTML='';
   const div=document.createElement('div');div.className='tab';
-  const map=[dashHTML,macrosHTML,workoutsHTML,weightHTML,foodDBHTML];
+  const map=[dashHTML,macrosHTML,weightHTML,foodDBHTML];
   div.innerHTML=(map[state.tab]||dashHTML)();
   m.appendChild(div);
   afterRender();
 }
 function afterRender(){
   const mc=document.getElementById('macrosChartOuter');if(mc)drawMacrosChart(mc);
+  const mc2=document.getElementById('macrosChartOuter2');if(mc2)drawMacrosChart2(mc2);
   const wc=document.getElementById('weightChartOuter');if(wc)drawWeightChart(wc);
   const wc2=document.getElementById('weightChartOuter2');if(wc2)drawWeightChart(wc2);
-  const wkc=document.getElementById('workoutChartOuter');if(wkc)drawWorkoutChart(wkc,wkProgressEx);
   // scroll ai chat to bottom
   const ac=document.getElementById('aiChat');if(ac)ac.scrollTop=ac.scrollHeight;
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // DASHBOARD
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
+let _dashDate=null;
 function dashHTML(){
-  const tdee=calcTDEE(),mt=getMT(),tot=getTotals(today()),p=state.profile;
+  const displayDate=_dashDate||today();
+  const tdee=calcTDEE(),mt=getMT(),tot=getTotals(displayDate),p=state.profile;
   const preset=GOAL_PRESETS[p.goal??2];
   const wl=[...state.weightLog].sort((a,b)=>a.date.localeCompare(b.date));
   const latest=wl.length?wl[wl.length-1].weight:null;
@@ -381,7 +382,7 @@ function dashHTML(){
         ${preset.cleanBulk?`<p style="font-size:.68rem;color:var(--green);margin-top:.38rem">🥦 Clean Bulk · ${getProtTarget().min}–${getProtTarget().max}g protein target</p>`:''}`
       :`<p class="empty">Tap Edit to set up your profile</p>`}
     </div>
-    <div class="card s2"><div class="ch"><span class="ct">Today — ${today()}</span></div>
+    <div class="card s2"><div class="ch"><span class="ct">Daily Log</span><input type="date" class="fi" style="width:auto;padding:.26rem .52rem;font-size:.76rem" id="dashDate" value="${displayDate}" onchange="_dashDate=this.value;renderMain()"></div>
       <div class="rings">${ring('Cal',tot.cal,mt.cal.max,'#f59e0b')}${ring('Pro',tot.protein,mt.protein.max,'#6ee7b7')}${ring('Carbs',tot.carbs,mt.carbs.max,'#60a5fa')}${ring('Fat',tot.fat,mt.fat.max,'#f87171')}</div>
       <div style="margin-top:.75rem">
         <div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:.2rem"><span style="color:var(--muted)">Calories</span><span>${tot.cal} / ${mt.cal.max}</span></div>${pbar(tot.cal,mt.cal.max,'var(--amber)')}
@@ -389,7 +390,7 @@ function dashHTML(){
       </div>
     </div>
     <div class="card"><div class="ch"><span class="ct">Weight</span></div>
-      <div class="wsnap"><span class="wb">${latest||'—'}</span><span class="wu">lbs</span>${diff!=null?`<span style="font-size:.78rem;font-weight:700;color:${+diff<0?'var(--green)':'var(--red)'};margin-left:.28rem">${+diff>0?'+':''}${diff}</span>`:''}</div>
+      <div class="wsnap"><span class="wb">${latest||'—'}</span><span class="wu">lbs</span>${diff!=null?`<span style="font-size:.78rem;font-weight:700;color:${+diff<0?'var(--green)':'var(--red)'};margin-left:auto">${+diff>0?'+':''}${diff}</span>`:''}</div>
       <div class="chart-scroll-outer" id="weightChartOuter" style="margin-top:.45rem"></div>
     </div>
     <div class="card"><div class="ch"><span class="ct">Targets</span><button class="btn btn-g" onclick="openGoals()">Edit</button></div>
@@ -404,9 +405,9 @@ function dashHTML(){
   </div>`;
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // MACROS TAB
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 let _macroDate=null;
 function macrosHTML(){
   const date=_macroDate||today();
@@ -453,10 +454,15 @@ function macrosHTML(){
       </tbody>
     </table></div>`}
   </div>
-  <div class="card"><div class="ch"><span class="ct">All-Time History</span><span style="font-size:.64rem;color:var(--muted)">← swipe · tap point</span></div>
+  <div class="card"><div class="ch"><span class="ct">Calories History</span><span style="font-size:.64rem;color:var(--muted)">← swipe · tap point</span></div>
     <div class="chart-scroll-outer" id="macrosChartOuter"></div>
     <div class="chart-legend">
       <div class="cl-item"><div class="cl-dot" style="background:#f59e0b"></div>Calories</div>
+    </div>
+  </div>
+  <div class="card"><div class="ch"><span class="ct">Protein History</span><span style="font-size:.64rem;color:var(--muted)">← swipe · tap point</span></div>
+    <div class="chart-scroll-outer" id="macrosChartOuter2"></div>
+    <div class="chart-legend">
       <div class="cl-item"><div class="cl-dot" style="background:#6ee7b7"></div>Protein (g)</div>
     </div>
   </div>`;
@@ -512,82 +518,21 @@ function drawMacrosChart(outer){
   if(!dates.length){outer.innerHTML='<p class="empty" style="padding:.7rem">Log food to see history.</p>';return;}
   const mt=getMT();
   makeScrollChart(outer.id,[
-    {data:dates.map(d=>getTotals(d).cal||null),color:'#f59e0b',fill:true,targetMax:mt.cal.max,targetMin:mt.cal.min||mt.cal.max*0.85},
-    {data:dates.map(d=>getTotals(d).protein||null),color:'#6ee7b7',fill:false,targetMax:mt.protein.max,targetMin:mt.protein.min||0}
+    {data:dates.map(d=>getTotals(d).cal||null),color:'#f59e0b',fill:true,targetMax:mt.cal.max,targetMin:mt.cal.min||mt.cal.max*0.85}
+  ],dates,{height:CHART_H});
+}
+function drawMacrosChart2(outer){
+  const dates=Object.keys(state.macroLog).filter(d=>(state.macroLog[d]||[]).length>0).sort();
+  if(!dates.length){outer.innerHTML='<p class="empty" style="padding:.7rem">Log food to see history.</p>';return;}
+  const mt=getMT();
+  makeScrollChart(outer.id,[
+    {data:dates.map(d=>getTotals(d).protein||null),color:'#6ee7b7',fill:true,targetMax:mt.protein.max,targetMin:mt.protein.min||0}
   ],dates,{height:CHART_H});
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// WORKOUTS TAB
-// ══════════════════════════════════════════════════════════════════════════════
-let wkView='log',wkProgressEx='',_wkDate=null;
-function workoutsHTML(){
-  return `<div class="shdr"><h2>Workouts</h2>
-    <div class="toggle-r">
-      <button class="pill${wkView==='log'?' on':''}" onclick="wkView='log';renderMain()">Log</button>
-      <button class="pill${wkView==='progress'?' on':''}" onclick="wkView='progress';renderMain()">Progress</button>
-    </div></div>
-  ${wkView==='log'?workoutLogHTML():workoutProgressHTML()}`;
-}
-function workoutLogHTML(){
-  const date=_wkDate||today();_wkDate=date;
-  const dw=state.workouts[date]||[];
-  return `<div style="margin-bottom:.7rem"><input type="date" class="fi" style="width:auto;padding:.26rem .52rem;font-size:.76rem" id="wkDate" value="${date}" onchange="_wkDate=this.value;renderMain()"></div>
-  <div class="card"><span class="ct">Add Exercise</span>
-    <div class="frow" style="margin-top:.42rem"><label class="fl" style="flex:2">Exercise<input class="fi" id="exName" placeholder="Bench Press" list="exList"></label></div>
-    <datalist id="exList">${getAllExercises().map(e=>`<option value="${e}">`).join('')}</datalist>
-    <button class="btn btn-p" onclick="addExercise('${date}')">+ Add Exercise</button>
-  </div>
-  ${dw.length===0?`<p class="empty" style="margin-top:.85rem">No exercises logged.</p>`:''}
-  ${dw.map((ex,ei)=>`<div class="card" style="margin-top:.7rem">
-    <div class="ch"><span style="font-weight:700">${ex.exercise}</span><button class="btn-x" onclick="removeExercise('${date}',${ei})">✕</button></div>
-    <div class="sets">${ex.sets.map((s,si)=>`<div class="srow"><span class="snum">Set ${si+1}</span>
-      <span class="bdg b">${s.reps} reps</span><span class="bdg a">${s.weight} lbs</span><span class="bdg g">${s.reps*s.weight} vol</span>
-      <button class="btn-x" onclick="removeSet('${date}',${ei},${si})">✕</button></div>`).join('')}</div>
-    <div class="frow">
-      <label class="fl">Reps<input class="fi" id="reps_${ei}" type="number" placeholder="8"></label>
-      <label class="fl">Weight (lbs)<input class="fi" id="wgt_${ei}" type="number" placeholder="135"></label>
-      <button class="btn btn-s" style="align-self:flex-end;margin-bottom:1px" onclick="addSet('${date}',${ei})">+ Set</button>
-    </div></div>`).join('')}`;
-}
-function workoutProgressHTML(){
-  const exs=getAllExercises();
-  if(!wkProgressEx&&exs.length)wkProgressEx=exs[0];
-  const pd=getProgressData(wkProgressEx);
-  return `<div class="card"><label class="fl">Exercise
-    <select class="fi" onchange="wkProgressEx=this.value;renderMain()">
-      <option value="">-- select --</option>
-      ${exs.map(e=>`<option value="${e}"${e===wkProgressEx?' selected':''}>${e}</option>`).join('')}
-    </select></label></div>
-  ${wkProgressEx&&pd.length>0?`<div class="card" style="margin-top:.7rem">
-    <div class="ch"><span class="ct">Max Weight — ${wkProgressEx}</span><span class="bdg b">PR: ${Math.max(...pd.map(d=>d.maxW))} lbs</span></div>
-    <div class="chart-scroll-outer" id="workoutChartOuter"></div>
-    <div class="chart-legend"><div class="cl-item"><div class="cl-dot" style="background:#60a5fa"></div>Max Weight</div><div class="cl-item"><div class="cl-dot" style="background:#a78bfa"></div>Vol ÷ 10</div></div>
-    <p class="chart-hint">← swipe to see all sessions</p>
-    <div class="tw" style="margin-top:.7rem"><table>
-      <thead><tr><th>Date</th><th>Max Weight</th><th>Max Volume</th></tr></thead>
-      <tbody>${[...pd].reverse().map(d=>`<tr><td>${d.date}</td><td><span class="bdg b">${d.maxW} lbs</span></td><td><span class="bdg v">${d.maxVol}</span></td></tr>`).join('')}</tbody>
-    </table></div></div>`:`<p class="empty" style="margin-top:.85rem">${wkProgressEx?'No data yet.':'Select an exercise.'}</p>`}`;
-}
-function getAllExercises(){return[...new Set(Object.values(state.workouts).flat().map(w=>w.exercise))].sort()}
-function getProgressData(ex){
-  if(!ex)return[];
-  return Object.entries(state.workouts).sort(([a],[b])=>a.localeCompare(b))
-    .flatMap(([d,exs])=>exs.filter(e=>e.exercise===ex).map(e=>({date:d,maxW:Math.max(...e.sets.map(s=>s.weight),0),maxVol:Math.max(...e.sets.map(s=>s.reps*s.weight),0)})));
-}
-function drawWorkoutChart(outer,ex){
-  const pd=getProgressData(ex);
-  if(!pd.length){outer.innerHTML='';return;}
-  makeScrollChart(outer.id,[{data:pd.map(d=>d.maxW),color:'#60a5fa',fill:true},{data:pd.map(d=>d.maxVol/10),color:'#a78bfa',fill:false}],pd.map(d=>d.date),{height:CHART_H});
-}
-function addExercise(date){const name=document.getElementById('exName')?.value.trim();if(!name)return;if(!state.workouts[date])state.workouts[date]=[];state.workouts[date].push({exercise:name,sets:[]});save('workouts');renderMain()}
-function removeExercise(date,ei){state.workouts[date].splice(ei,1);save('workouts');renderMain()}
-function addSet(date,ei){const r=+document.getElementById(`reps_${ei}`)?.value||0,w=+document.getElementById(`wgt_${ei}`)?.value||0;if(!r)return;state.workouts[date][ei].sets.push({reps:r,weight:w});save('workouts');renderMain()}
-function removeSet(date,ei,si){state.workouts[date][ei].sets.splice(si,1);save('workouts');renderMain()}
-
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // WEIGHT TAB
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 function weightHTML(){
   const wl=[...state.weightLog].sort((a,b)=>a.date.localeCompare(b.date));
   const latest=wl.length?+wl[wl.length-1].weight:null;
@@ -640,9 +585,9 @@ function logWeight(){
 }
 function removeWeight(date){state.weightLog=state.weightLog.filter(e=>e.date!==date);save('weightLog');renderMain()}
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // FOOD DATABASE TAB
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 let dbSearch='',dbEditIdx=-1;
 function foodDBHTML(){
   const q=dbSearch.toLowerCase();
@@ -709,9 +654,9 @@ function deleteFoodDB(idx){
   state.foodDB.splice(idx,1);save('foodDB');toast('Deleted','var(--red)');renderMain();
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // MODALS — Profile & Goals
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 function openProfile(){
   const p=state.profile;
   const modal=document.createElement('div');modal.className='modal-bg';modal.id='profileModal';
@@ -779,18 +724,18 @@ function saveGoals(){
 function closeModal(id){const m=document.getElementById(id);if(m)m.remove()}
 document.addEventListener('click',e=>{if(e.target.classList.contains('modal-bg'))e.target.remove()});
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // SERVICE WORKER (offline)
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 if('serviceWorker' in navigator){
-  const sw=`const C='macrobot-v1';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['.']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const cl=res.clone();caches.open(C).then(c=>c.put(e.request,cl));return res}))));`;
+  const sw=`const C='macrobot-v1';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['.']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
   const blob=new Blob([sw],{type:'application/javascript'});
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 // INIT
-// ══════════════════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 renderTabBar();renderMain();
 window.addEventListener('resize',()=>afterRender());
 </script>
